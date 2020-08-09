@@ -67,3 +67,18 @@ df
 #do project normally
 
 write.table(df, file="bondyield.csv", row.names=F, sep = ",")
+
+# plotting the evaluation of bond yields
+library(viridisLite)
+library(magma)
+yields <- dfasxts
+plot.type <- "single"
+plot.palette <- magma(n = 30)
+asset.names <- colnames(dfasxts)
+plot.zoo(x = dfasxts, plot.type = "single", col = plot.palette, ylab = "", xlab = "")
+legend(x = "topright", legend = asset.names, col = plot.palette, cex = 0.45, lwd = 3)
+
+#differentiate time series analysis
+dfasxts_d <- diff(dfasxts)
+
+plot.zoo(x = dfasxts_d, plot.type = "multiple", ylim = c(-0.5, 0.5), cex.axis = 0.7, ylab = 1:30, col = plot.palette, main = "", xlab = "")

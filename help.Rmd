@@ -1,0 +1,68 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+#necessary packages
+library(dygraphs)
+library(Quandl)
+library(dplyr)
+#library(plotly)
+#library(shiny)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+#get dataset, filter for coronavirus dates
+df <- Quandl("FED/SVENY", api_key="15cxBvvbCzucYDswsDfJ")
+covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-07-16')
+
+str(df)
+```
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+```{r}
+dfasxts <- as.xts(x = df[, -1], order.by = df$Date)
+covid_dates <- as.xts(x = covid_dates[, -1], order.by = covid_dates$Date)
+dygraph(covid_dates, main = "Zero Coupon Yields (1-30) 2020", ylab = "Value") %>%
+            dyAxis('x', axisLabelFontSize = 12) %>%
+            dyRangeSelector()
+```
+
+
+```{r}
+df$Date <- as.Date(df$Date)
+df$year <- format(as.Date(df$Date, format="%m/%d/%Y"),"%Y")
+df <- select(df, -Date)
+df <- na.omit(df)
+
+df <- df %>%
+  group_by(year) %>%
+  summarise_all(mean)
+```
+
+#look at Tableau file for graph to create from df
+
+```{r}
+# plotting the evaluation of bond yields
+library(viridisLite)
+yields <- dfasxts
+plot.type <- "single"
+plot.palette <- magma(n = 30)
+asset.names <- colnames(dfasxts)
+plot.zoo(x = dfasxts, plot.type = "single", col = plot.palette, ylab = "", xlab = "")
+legend(x = "topleft", legend = asset.names, col = plot.palette, cex = 0.45, lwd = 3)
+```
+
+```{r}
+dfasxts_d <- diff(dfasxts)
+
+plot.zoo(x = dfasxts_d, plot.type = "multiple", ylim = c(-0.5, 0.5), cex.axis = 0.7, ylab = 1:30, col = plot.palette, main = "", xlab = "")
+
+```
+

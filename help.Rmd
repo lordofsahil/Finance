@@ -46,9 +46,7 @@ df <- df %>%
   group_by(year) %>%
   summarise_all(mean)
 ```
-```{r}
 
-```
 
 ```{r}
   
@@ -62,15 +60,16 @@ data <- select(data, year, SVENY01, SVENY10, SVENY30)
 fig <- plot_ly(data, x = data$year, y = ~SVENY01, name = 'SVENY01', type = 'scatter', mode = 'lines + markers') 
 fig <- fig %>% add_trace(y = ~SVENY10, name = 'SVENY10', mode = 'lines + markers') 
 fig <- fig %>% add_trace(y = ~SVENY30, name = 'SVENY30', mode = 'lines + markers')
-fig <- fig %>% layout(title = "1, 10, and 30 year maturity yield", adj = 0,
+fig <- fig %>% layout(title = "",
          xaxis = list(title = "year"),
          yaxis = list (title = "value"))
-fig
 
 ```
+### 1, 10, and 30 year maturity bond yield averages across time
 
-
-#look at Tableau file for graph to create from df
+```{r}
+fig
+```
 
 ```{r}
 # plotting the evaluation of bond yields

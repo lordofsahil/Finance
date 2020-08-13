@@ -12,6 +12,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 library(dygraphs)
 library(Quandl)
 library(dplyr)
+library(rugarch)
 #library(plotly)
 #library(shiny)
 ```
@@ -20,7 +21,7 @@ Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by press
 ```{r}
 #get dataset, filter for coronavirus dates
 df <- Quandl("FED/SVENY", api_key="15cxBvvbCzucYDswsDfJ")
-covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-07-16')
+covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-08-10')
 
 str(df)
 ```
@@ -45,6 +46,29 @@ df <- df %>%
   group_by(year) %>%
   summarise_all(mean)
 ```
+```{r}
+
+```
+
+```{r}
+  
+SVENY01 <- df$SVENY01
+SVENY10 <- df$SVENY10
+SVENY30 <- df$SVENY30
+
+
+data <- data.frame(df, SVENY01, SVENY10, SVENY30)
+data <- select(data, year, SVENY01, SVENY10, SVENY30)
+fig <- plot_ly(data, x = data$year, y = ~SVENY01, name = 'SVENY01', type = 'scatter', mode = 'lines + markers') 
+fig <- fig %>% add_trace(y = ~SVENY10, name = 'SVENY10', mode = 'lines + markers') 
+fig <- fig %>% add_trace(y = ~SVENY30, name = 'SVENY30', mode = 'lines + markers')
+fig <- fig %>% layout(title = "1, 10, and 30 year maturity yield", adj = 0,
+         xaxis = list(title = "year"),
+         yaxis = list (title = "value"))
+fig
+
+```
+
 
 #look at Tableau file for graph to create from df
 
@@ -63,6 +87,59 @@ legend(x = "topleft", legend = asset.names, col = plot.palette, cex = 0.45, lwd 
 dfasxts_d <- diff(dfasxts)
 
 plot.zoo(x = dfasxts_d, plot.type = "multiple", ylim = c(-0.5, 0.5), cex.axis = 0.7, ylab = 1:30, col = plot.palette, main = "", xlab = "")
+
+```
+
+```{r}
+dfasxts <- dfasxts_d["2000/",]
+x_1 <- dfasxts[,"SVENY01"]
+x_20 <- dfasxts[, "SVENY20"]
+
+# Plot the autocorrelations of the yield changes)
+par(mar=c(5.1, 4.1, 4.1, 2.1))
+par(mfrow=c(2,2))
+acf_1 <- acf(x_1)
+acf_20 <- acf(x_20)
+
+# Plot the autocorrelations of the absolute changes of yields
+acf_abs_1 <- acf(abs(x_1))
+acf_abs_20 <- acf(abs(x_20))
+
+
+```
+
+
+
+```{r}
+
+spec <- ugarchspec(distribution.model = "sstd")
+
+
+fit_1 <- ugarchfit(x_1, spec = spec)
+
+
+vol_1 <- sigma(fit_1)
+res_1 <- scale(residuals(fit_1, standardize = TRUE)) * sd(x_1) + mean(x_1)
+
+
+merge_1 <- merge.xts(x_1, vol_1, res_1)
+plot.zoo(merge_1, xlab = "Year")
+
+####################
+
+fit_20 <- ugarchfit(x_20, spec = spec)
+
+
+vol_20 <- sigma(fit_20)
+res_20 <- scale(residuals(fit_20, standardize = TRUE)) * sd(x_20) + mean(x_20)
+
+
+merge_20 <- merge.xts(x_20, vol_20, res_20)
+plot.zoo(merge_20, xlab = "Year")
+
+```
+
+```{r}
 
 ```
 

@@ -1,11 +1,8 @@
 ---
-title: "R Notebook"
+title: "Modeling the Volatility of U.S Bond Yields"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
 #necessary packages
@@ -13,7 +10,8 @@ library(dygraphs)
 library(Quandl)
 library(dplyr)
 library(rugarch)
-#library(plotly)
+library(plotly)
+library(RColorBrewer)
 #library(shiny)
 ```
 
@@ -70,6 +68,19 @@ fig <- fig %>% layout(title = "",
 ```{r}
 fig
 ```
+
+```{r}
+row.names(df) <- df$year
+df <- select(df, -year)
+df_matrix <- data.matrix(df)
+
+df_heatmap <- heatmap(df_matrix, Rowv=NA, Colv=NA, col = brewer.pal(6, "Greys"), scale="column", margins=c(4,1), main = "Heatmap")
+```
+
+
+
+
+
 
 ```{r}
 # plotting the evaluation of bond yields

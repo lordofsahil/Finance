@@ -24,11 +24,11 @@ covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-08-10')
 str(df)
 ```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
 ```{r}
 dfasxts <- as.xts(x = df[, -1], order.by = df$Date)
 covid_dates <- as.xts(x = covid_dates[, -1], order.by = covid_dates$Date)
-dygraph(covid_dates, main = "Zero Coupon Yields (1-30) 2020", ylab = "Value") %>%
+dygraph(covid_dates, main = "All Zero Coupon Yields (1-30) 2020", ylab = "Value") %>%
             dyAxis('x', axisLabelFontSize = 12) %>%
             dyRangeSelector()
 ```
@@ -150,6 +150,51 @@ plot.zoo(merge_20, xlab = "Year")
 ```
 
 ```{r}
-
+par(mar=c(5.1, 4.1, 4.1, 2.1))
+par(mfrow=c(2,1))
+hist(res_1)
+hist(res_20)
+ugarchspec()
 ```
 
+
+
+```{r}
+density_x_1 <- density(x_1)
+density_res_1 <- density(res_1)
+
+
+plot(density_x_1)
+lines(density_res_1, col = "red")
+
+
+norm_dist <- dnorm(seq(-0.4, 0.4, by = .01), mean = mean(x_1), sd = sd(x_1))
+lines(seq(-0.4, 0.4, by = .01), 
+      norm_dist, 
+      col = "darkblue"
+     )
+
+# Add legend
+legend <- c("Before GARCH", "After GARCH", "Normal distribution")
+legend("topleft", legend = legend, 
+       col = c("black", "red", "darkblue"), lty=c(1,1))
+```
+
+
+```{r}
+distribution <- qnorm
+
+
+qqnorm(x_1, ylim = c(-0.5, 0.5))
+qqline(x_1, distribution = distribution, col = "darkgreen")
+
+
+par(new=TRUE)
+qqnorm(res_1 * 0.614256270265139, col = "red", ylim = c(-0.5, 0.5))
+qqline(res_1 * 0.614256270265139, distribution = distribution, col = "darkgreen")
+legend("topleft", c("Before GARCH", "After GARCH"), col = c("black", "red"), pch=c(1,1))
+```
+
+
+
+#### Garch modeling brought the residuals closer to normal distribution. Year 1 yield deviates more from a normally distributed white noise process.

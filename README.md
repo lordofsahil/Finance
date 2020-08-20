@@ -1,5 +1,10 @@
 # Finance
 
-Modeling the Volatiilty over U.S Bond Yields (In Progress)
+Modeling the Volatiilty over U.S Bond Yields 
 
-- plotly and dygraph. 
+Analyzing Time Series Data from Quandl
+
+# Includes
+- Interactive Data Visualizations
+- GARCH Modeling
+- Descriptive Statistics

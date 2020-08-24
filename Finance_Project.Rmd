@@ -1,18 +1,29 @@
 ---
 title: "Modeling the Volatility of U.S Bond Yields"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 ### The prompt and base code for this project can be found on Datacamp. The basis of this is to explore the volatility of Zero Coupon Bond Yields (from year maturities 1-30) and see how that has changed since the 1960's. Below, I loaded the necessary librares and did some data exploration of the time series data obtained from Quandl. This was obtained making an API call. 
 
-```{r}
-#necessary packages
+
+## Necessary packages
+```{r message=FALSE}
+
+defaultW <- getOption("warn") 
+
+options(warn = -1) 
+
 library(dygraphs)
 library(Quandl)
 library(dplyr)
 library(rugarch)
 library(plotly)
 library(RColorBrewer)
-#library(shiny)
+
+options(warn = defaultW)
+
+
 ```
 
 

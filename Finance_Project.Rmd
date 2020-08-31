@@ -79,7 +79,7 @@ fig <- fig %>% layout(title = "",
 ```{r}
 fig
 ```
-### Bond yield heat map
+
 ```{r}
 row.names(df) <- df$year
 df <- select(df, -year)

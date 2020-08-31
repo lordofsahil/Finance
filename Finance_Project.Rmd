@@ -1,6 +1,6 @@
 ---
 title: "Modeling the Volatility of U.S Bond Yields"
-output:
+output: 
   html_document:
     df_print: paged
 ---
@@ -10,7 +10,7 @@ output:
 ## Necessary packages
 ```{r message=FALSE}
 
-defaultW <- getOption("warn") 
+
 
 options(warn = -1) 
 
@@ -21,7 +21,7 @@ library(rugarch)
 library(plotly)
 library(RColorBrewer)
 
-options(warn = defaultW)
+
 
 
 ```
@@ -30,7 +30,7 @@ options(warn = defaultW)
 ```{r}
 #get dataset, filter for coronavirus dates
 df <- Quandl("FED/SVENY", api_key="15cxBvvbCzucYDswsDfJ")
-covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-08-20')
+covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-08-31')
 
 str(df)
 ```
@@ -102,6 +102,7 @@ legend(x = "topleft", legend = asset.names, col = plot.palette, cex = 0.45, lwd 
 ```
 
 ```{r}
+#plotting yield changes from differentiated time series
 dfasxts_d <- diff(dfasxts)
 
 plot.zoo(x = dfasxts_d, plot.type = "multiple", ylim = c(-0.5, 0.5), cex.axis = 0.7, ylab = 1:30, col = plot.palette, main = "", xlab = "")
@@ -122,14 +123,14 @@ acf_20 <- acf(x_20)
 # Plot the autocorrelations of the absolute changes of yields
 acf_abs_1 <- acf(abs(x_1))
 acf_abs_20 <- acf(abs(x_20))
-
-
+# if autocorrelation is close to one, then past data value will be very close to next day value
+# if autocorrelation is close to zero, then past data value will not have an effect on next day value
 ```
 
 
 
 ```{r}
-
+#GARCH modeling ; Fitting one year and twenty year maturities
 spec <- ugarchspec(distribution.model = "sstd")
 
 
@@ -163,11 +164,13 @@ par(mfrow=c(2,1))
 hist(res_1)
 hist(res_20)
 ugarchspec()
+#specs of the GARCH Model, and histogram if year one and year twenty residuals
 ```
 
 
 
 ```{r}
+#year one model has greater and larger volatility than the twenty year model. Lets plot a density diagram and examine the distributionsx
 density_x_1 <- density(x_1)
 density_res_1 <- density(res_1)
 
@@ -205,4 +208,4 @@ legend("topleft", c("Before GARCH", "After GARCH"), col = c("black", "red"), pch
 
 
 # Conclusion
-#### Garch modeling brought the residuals closer to normal distribution. Year 1 yield deviates more from a normally distributed white noise process than a 20 year yield. 
+#### Garch modeling brought the residuals closer to normal distribution. Garch modeling also revealed how volatility has changed over time. Year 1 yield deviates more from a normally distributed white noise process than a 20 year yield. 

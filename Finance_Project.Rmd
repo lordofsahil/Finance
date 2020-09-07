@@ -30,12 +30,12 @@ library(RColorBrewer)
 ```{r}
 #get dataset, filter for coronavirus dates
 df <- Quandl("FED/SVENY", api_key="15cxBvvbCzucYDswsDfJ")
-covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-08-31')
+covid_dates <- subset(df, Date > '2020-01-01' & Date < '2020-09-07')
 
 str(df)
 ```
 
-### Plotting daily estimates for yall zero coupon yields for 2020
+### Plotting daily estimates for all zero coupon yields in 2020
 ```{r}
 dfasxts <- as.xts(x = df[, -1], order.by = df$Date)
 covid_dates <- as.xts(x = covid_dates[, -1], order.by = covid_dates$Date)
@@ -71,10 +71,10 @@ fig <- fig %>% add_trace(y = ~SVENY10, name = 'SVENY10', mode = 'lines + markers
 fig <- fig %>% add_trace(y = ~SVENY30, name = 'SVENY30', mode = 'lines + markers')
 fig <- fig %>% layout(title = "",
          xaxis = list(title = "year"),
-         yaxis = list (title = "value"))
+         yaxis = list (title = ""))
 
 ```
-### 1, 10, and 30 year maturity bond yield averages across time
+### 1, 10, and 30 year maturity bond yield estimate averages across time
 
 ```{r}
 fig
@@ -85,7 +85,7 @@ row.names(df) <- df$year
 df <- select(df, -year)
 df_matrix <- data.matrix(df)
 
-df_heatmap <- heatmap(df_matrix, Rowv=NA, Colv=NA, col = brewer.pal(6, "Greys"), scale="column", margins=c(4,1), main = "Heatmap")
+df_heatmap <- heatmap(df_matrix, Rowv=NA, Colv=NA, col = brewer.pal(6, "Greys"), scale="column", margins=c(4,1), main = "Bond Yield Estimate Averages Heatmap")
 
 ```
 
@@ -208,4 +208,4 @@ legend("topleft", c("Before GARCH", "After GARCH"), col = c("black", "red"), pch
 
 
 # Conclusion
-#### Garch modeling brought the residuals closer to normal distribution. Garch modeling also revealed how volatility has changed over time. Year 1 yield deviates more from a normally distributed white noise process than a 20 year yield. 
+#### To begin the time series data was pulled from Quandl using an API call. Out of curiosity, I plotted the daily estimates for all bond yields in the year 2020 using a dygraph. From there I averaged the bond yield estimates for all years to see how they have changed over time. Using plotly I displayed the averages of SVENY01 SVENY10, and SVENY30 per year. A heatmap was also generated to display the average estimates for all zero coupon bond yields. Moving on, I plotted the evaluation of bond yields. We can see the level of bond yields for some maturities but to recognize volatility we need to see changes in the yield levels. We need to differentiate the time series and make the time series independent of time. After plotting the differentiated series, we can dive into statistics. Testing for autocorrelation on the previous graph reveals two things; If autocorrelation is close to one, then past data value will be very close to next day value, if autocorrelation is close to zero, then past data value will not have an effect on next day value. After this, I utilized Garch (Generalized AutoRegressive Conditional Heteroskedasticity) which specializes in handeling changing volatility in financial time series data. I fit Garch modeling on the one year and twenty year maturities. The first year model is showing more erratic behavior than the twenty year model, this is because the year one model has greater volatility. Then we wanted to see what the fitted model did with the distribution. Garch modeling brought the residuals closer to normal distribution. Overall, Garch modeling also revealed how volatility has changed over time.
